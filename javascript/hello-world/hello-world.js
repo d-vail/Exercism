@@ -1,10 +1,10 @@
-//
-// This is only a SKELETON file for the 'Hello World' exercise. It's been provided as a
-// convenience to get you started writing code faster.
-//
+/**
+ * @file The classical introductory exercise. Just say "Hello, World!".
+ */
 
-export const hello = () => {
-  //
-  // YOUR CODE GOES HERE
-  //
-};
+/**
+ * Return the string "Hello, World!"
+ *
+ * @returns {string}
+ */
+export const hello = () => 'Hello, World!';
