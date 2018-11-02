@@ -3,7 +3,7 @@
  */
 
 /**
- * Return the string "Hello, World!"
+ * Return the string "Hello, World!".
  *
  * @returns {string}
  */
