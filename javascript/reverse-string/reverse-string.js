@@ -7,7 +7,7 @@
  * @param {string} str - Input string.
  * @returns {string} The input string reversed.
  */
-const reverseString = (str) => {
+export default (str) => {
   let reverseStr = '';
 
   for (let i = str.length - 1; i >= 0; i -= 1) {
@@ -16,5 +16,3 @@ const reverseString = (str) => {
 
   return reverseStr;
 };
-
-export default reverseString;

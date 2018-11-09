@@ -2,7 +2,7 @@
  * @file Exercism: RNA Transcription
  */
 
- /**
+/**
   * DNA to RNA nucleotide complements.
   * @const {object}
   */
