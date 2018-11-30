@@ -18,18 +18,27 @@ const CODON_TO_PROTEIN = {
   UGA: false,
 };
 
-export default (rna = '') => {
-  const codons = rna.match(/(.{3})/g) || [];
+const getCodons = rna => rna.match(/(.{3})/g) || [];
 
-  return codons.reduce(
-    (acc, codon) => {
-      if (acc.stop) return acc;
-
-      const protein = CODON_TO_PROTEIN[codon];
-      return protein
-        ? { ...acc, polypeptide: acc.polypeptide.concat([protein]) }
-        : { ...acc, stop: true };
-    },
-    { stop: false, polypeptide: [] },
-  ).polypeptide;
+const getProtein = (codon) => {
+  const protein = CODON_TO_PROTEIN[codon];
+  if (typeof protein === 'undefined') throw new Error('Invalid codon');
+  return protein;
 };
+
+const translate = codons => codons.reduce(
+  (acc, codon) => {
+    const { stop, polypeptide } = acc;
+    const protein = getProtein(codon);
+
+    return stop
+      ? acc
+      : {
+        stop: !protein,
+        polypeptide: protein ? polypeptide.concat([protein]) : polypeptide,
+      };
+  },
+  { stop: false, polypeptide: [] },
+).polypeptide;
+
+export default (rna = '') => translate(getCodons(rna));
