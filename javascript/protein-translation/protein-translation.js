@@ -18,14 +18,18 @@ const CODON_TO_PROTEIN = {
   UGA: false,
 };
 
-export default rna => rna.match(/(.{3})/g).reduce(
-  (acc, codon) => {
-    if (acc.stop) return acc;
+export default (rna = '') => {
+  const codons = rna.match(/(.{3})/g) || [];
 
-    const protein = CODON_TO_PROTEIN[codon];
-    return protein
-      ? { ...acc, polypeptide: acc.polypeptide.concat([protein]) }
-      : { ...acc, stop: true };
-  },
-  { stop: false, polypeptide: [] },
-).polypeptide;
+  return codons.reduce(
+    (acc, codon) => {
+      if (acc.stop) return acc;
+
+      const protein = CODON_TO_PROTEIN[codon];
+      return protein
+        ? { ...acc, polypeptide: acc.polypeptide.concat([protein]) }
+        : { ...acc, stop: true };
+    },
+    { stop: false, polypeptide: [] },
+  ).polypeptide;
+};
