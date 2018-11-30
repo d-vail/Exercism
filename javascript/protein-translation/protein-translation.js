@@ -1,4 +1,4 @@
-const CODON_TO_PROTEIN = {
+const CODON_TABLE = {
   AUG: 'Methionine',
   UUU: 'Phenylalanine',
   UUC: 'Phenylalanine',
@@ -20,22 +20,22 @@ const CODON_TO_PROTEIN = {
 
 const getCodons = rna => rna.match(/(.{3})/g) || [];
 
-const getProtein = (codon) => {
-  const protein = CODON_TO_PROTEIN[codon];
-  if (typeof protein === 'undefined') throw new Error('Invalid codon');
-  return protein;
+const getAminoAcid = (codon) => {
+  const aminoAcid = CODON_TABLE[codon];
+  if (typeof aminoAcid === 'undefined') throw new Error('Invalid codon');
+  return aminoAcid;
 };
 
 const translate = codons => codons.reduce(
   (acc, codon) => {
     const { stop, polypeptide } = acc;
-    const protein = getProtein(codon);
+    const aminoAcid = getAminoAcid(codon);
 
     return stop
       ? acc
       : {
-        stop: !protein,
-        polypeptide: protein ? polypeptide.concat([protein]) : polypeptide,
+        stop: !aminoAcid,
+        polypeptide: aminoAcid ? polypeptide.concat([aminoAcid]) : polypeptide,
       };
   },
   { stop: false, polypeptide: [] },
