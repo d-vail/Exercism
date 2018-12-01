@@ -55,7 +55,24 @@ class ComputeCell extends InputCell {
     super(fn(inputCells));
     this.inputCells = inputCells;
     this.fn = fn;
+    this.callbacks = [];
     this.subscribe();
+  }
+
+  /**
+   * Adds a callback to this cell.
+   * @param {object} cb - A callback object.
+   */
+  addCallback(cb) {
+    this.callbacks.push(cb);
+  }
+
+  /**
+   * Removes the specified callback from this cell.
+   * @param {object} cb - A callback object.
+   */
+  removeCallback(cb) {
+    this.callbacks = this.callbacks.filter(callback => cb !== callback);
   }
 
   /**
@@ -63,8 +80,13 @@ class ComputeCell extends InputCell {
    * propagate the state.
    */
   setValue() {
-    this.value = this.fn(this.inputCells);
-    this.propagate();
+    const newValue = this.fn(this.inputCells);
+
+    if (newValue !== this.value) {
+      this.value = newValue;
+      this.propagate();
+      if (this.callbacks.length !== 0) this.callbacks.forEach(cb => cb.setValue(this));
+    }
   }
 
   /**
@@ -75,6 +97,26 @@ class ComputeCell extends InputCell {
   }
 }
 
-class CallbackCell {}
+/**
+ * Class representing a callback which tracks changes in state.
+ */
+class CallbackCell {
+  /**
+   * Creates a callback.
+   * @param {function} fn - The logic for grabbing the state change.
+   */
+  constructor(fn) {
+    this.fn = fn;
+    this.values = [];
+  }
+
+  /**
+   * Save the new state.
+   * @param {*} cell - A cell object who's state has just changed.
+   */
+  setValue(cell) {
+    this.values.push(this.fn(cell));
+  }
+}
 
 export { InputCell, ComputeCell, CallbackCell };
