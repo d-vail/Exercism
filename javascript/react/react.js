@@ -34,10 +34,10 @@ class InputCell {
   }
 
   /**
-   * Propagate changes to linked cells by calling setValue() on each linked cell.
+   * Propagate changes to linked cells.
    */
   propagate() {
-    this.linkedCells.forEach(linkedCell => linkedCell.setValue());
+    this.linkedCells.forEach(linkedCell => linkedCell.update());
   }
 }
 
@@ -68,6 +68,14 @@ class ComputeCell extends InputCell {
   }
 
   /**
+   * Check if computed value is different from saved value.
+   * @returns {boolean}
+   */
+  isNewValue() {
+    return this.fn(this.inputCells) !== this.value;
+  }
+
+  /**
    * Removes the specified callback from this cell.
    * @param {object} cb - A callback object.
    */
@@ -76,24 +84,21 @@ class ComputeCell extends InputCell {
   }
 
   /**
-   * Set the cell value using the function (fn) and input cells. Since the value is changing,
-   * propagate the state.
-   */
-  setValue() {
-    const newValue = this.fn(this.inputCells);
-
-    if (newValue !== this.value) {
-      this.value = newValue;
-      this.propagate();
-      if (this.callbacks.length !== 0) this.callbacks.forEach(cb => cb.setValue(this));
-    }
-  }
-
-  /**
    * Link this cell to each input cell so it change receive state changes.
    */
   subscribe() {
     this.inputCells.forEach(cell => cell.link(this));
+  }
+
+  /**
+   * If changes in the input cells this cell relies on will result in a new value, update this
+   * cell's value. After updates are complete, trigger any registered callbacks.
+   */
+  update() {
+    if (this.isNewValue()) {
+      this.setValue(this.fn(this.inputCells));
+      if (this.callbacks.length !== 0) this.callbacks.forEach(cb => cb.setValue(this));
+    }
   }
 }
 
