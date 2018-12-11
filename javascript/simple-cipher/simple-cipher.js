@@ -3,8 +3,8 @@
  */
 
 class Cipher {
-  constructor(key = null) {
-    this.key = key || Cipher.generateKey();
+  constructor(key = undefined) {
+    this.key = key === undefined ? Cipher.generateKey() : Cipher.validateKey(key);
   }
 
   /**
@@ -23,6 +23,17 @@ class Cipher {
    */
   static getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  /**
+   * Check if the key provided is valid.
+   * @param {string} key - The user provided key.
+   * @returns {string} The original key.
+   */
+  static validateKey(key) {
+    const invalid = key.length ? key.match(/[^a-z]/) : true;
+    if (invalid) throw new Error('Bad key');
+    return key;
   }
 }
 
