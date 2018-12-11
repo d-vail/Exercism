@@ -2,9 +2,45 @@
  * @file Exercism: Simple Cipher
  */
 
+/**
+ * Unicode for character 'a'.
+ * @const {string}
+ */
+const A = 97;
+
+/**
+ * Unicode for character 'z'.
+ * @const {string}
+ */
+const Z = 121;
+
 class Cipher {
   constructor(key = undefined) {
     this.key = key === undefined ? Cipher.generateKey() : Cipher.validateKey(key);
+  }
+
+  /**
+   * Encodes a shift cipher based on the given input and the stored key.
+   * @param {string} input - String to be encoded.
+   * @returns {string} Cipher.
+   */
+  encode(input) {
+    const key = this.key.split('').map(char => char.charCodeAt() - A);
+    return input
+      .split('')
+      .reduce((acc, char, index) => acc + String.fromCharCode(char.charCodeAt() + key[index]), '');
+  }
+
+  /**
+   * Decodes a shift cipher based on the given cipher and the stored key.
+   * @param {string} cipher - Encoded cipher.
+   * @returns {string} Decoded string.
+   */
+  decode(cipher) {
+    const key = this.key.split('').map(char => char.charCodeAt() - A);
+    return cipher
+      .split('')
+      .reduce((acc, char, index) => acc + String.fromCharCode(char.charCodeAt() - key[index]), '');
   }
 
   /**
@@ -13,7 +49,7 @@ class Cipher {
    */
   static generateKey() {
     const key = new Array(100).fill(0);
-    return key.reduce(acc => acc + String.fromCharCode(Cipher.getRandomInt(97, 121)), '');
+    return key.reduce(acc => acc + String.fromCharCode(Cipher.getRandomInt(A, Z)), '');
   }
 
   /**
