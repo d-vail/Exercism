@@ -12,11 +12,20 @@ const A = 97;
  * Unicode for character 'z'.
  * @const {string}
  */
-const Z = 121;
+const Z = 122;
+
+/**
+ * Total number of available characters for cipher.
+ * @const {number}
+ */
+const LETTERS = 26;
 
 class Cipher {
   constructor(key = undefined) {
-    this.key = key === undefined ? Cipher.generateKey() : Cipher.validateKey(key);
+    const cipherKey = key === undefined ? Cipher.generateKey() : Cipher.validateKey(key);
+
+    this.key = cipherKey;
+    this.keyShift = Cipher.getKeyShift(cipherKey);
   }
 
   /**
@@ -25,10 +34,7 @@ class Cipher {
    * @returns {string} Cipher.
    */
   encode(input) {
-    const key = this.key.split('').map(char => char.charCodeAt() - A);
-    return input
-      .split('')
-      .reduce((acc, char, index) => acc + String.fromCharCode(char.charCodeAt() + key[index]), '');
+    return input.split('').reduce((acc, char, index) => acc + this.getEncodedChar(char, index), '');
   }
 
   /**
@@ -37,10 +43,35 @@ class Cipher {
    * @returns {string} Decoded string.
    */
   decode(cipher) {
-    const key = this.key.split('').map(char => char.charCodeAt() - A);
     return cipher
       .split('')
-      .reduce((acc, char, index) => acc + String.fromCharCode(char.charCodeAt() - key[index]), '');
+      .reduce((acc, char, index) => acc + this.getDecodedChar(char, index), '');
+  }
+
+  /**
+   * When given a character from an input string and the index of that character, return
+   * the encoded character or the shifted character based on the stored key.
+   * @param {string} char - Character from input to be encoded.
+   * @param {number} index - Index of character from input.
+   * @returns {string} Encoded character.
+   */
+  getEncodedChar(char, index) {
+    const shift = char.charCodeAt() + this.keyShift[index];
+    const encodedCharCode = shift > Z ? shift - LETTERS : shift;
+    return String.fromCharCode(encodedCharCode);
+  }
+
+  /**
+   * When given a character from an cipher string and the index of that character, return
+   * the decoded character or the unshifted character based on the stored key.
+   * @param {string} char - Character from cipher to be decoded..
+   * @param {number} index - Index of character from cipher.
+   * @returns {string} Decoded character.
+   */
+  getDecodedChar(char, index) {
+    const shift = char.charCodeAt() - this.keyShift[index];
+    const decodedCharCode = shift < A ? shift + LETTERS : shift;
+    return String.fromCharCode(decodedCharCode);
   }
 
   /**
@@ -50,6 +81,15 @@ class Cipher {
   static generateKey() {
     const key = new Array(100).fill(0);
     return key.reduce(acc => acc + String.fromCharCode(Cipher.getRandomInt(A, Z)), '');
+  }
+
+  /**
+   * Get the shift length for each character in given key.
+   * @param {string} - Cipher key.
+   * @returns {array} The shift lengths.
+   */
+  static getKeyShift(key) {
+    return key.split('').map(char => char.charCodeAt() - A);
   }
 
   /**
